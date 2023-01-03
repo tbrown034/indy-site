@@ -1,21 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 
-const upload = () => {
-    return (
-        <>
-        <h3>Upload Form</h3>
-        <form>
-            <input type="file">
+const Upload = () => {
+  const [file, setFile] = useState(null);
+  const [error, setError] = useState(null);
+  const changeHandler = (e) => {
+    console.log("changed");
+    let selected = e.target.files[0];
+    console.log("selected: ", selected);
+    if (selected) {
+      setFile(selected);
+      setError('')
+    } else {
+      setFile(null);
+      setError("Please select an Image (png or jpeg)");
+    }
+  };
 
-            </input>
+  return (
+    <>
+      <h3>Upload Form</h3>
+      <form>
+        <input
+          type="file"
+          onChange={changeHandler}
+          accept="image/png, image/jpeg"
+        ></input>
+        <div className="output">
+            { error && <div className="error">{error} </div>
+                }
+                { file && <div className="succes">{file.name}</div>}
 
+        </div>
+      </form>
+    </>
+  );
+};
 
-        </form>
-
-        </>
-    )
-
-
-}
-
-export default upload
+export default Upload;
