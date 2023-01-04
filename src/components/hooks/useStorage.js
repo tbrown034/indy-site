@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { storage } from "../firebase/config";
+import { storage, firestoreDb } from "../firebase/config";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const useStorage = (file) => {
@@ -9,12 +9,8 @@ const useStorage = (file) => {
 
   useEffect(() => {
     // create reference
-    console.log("storage: ", storage);
-    const storageRef = ref(storage, file.name);
-    console.log("storageref: ", storageRef);
-
+    const storageRef = ref(storage, `PupImages/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
-
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -30,6 +26,7 @@ const useStorage = (file) => {
       }
     );
   }, [file]);
+
 
   return { progress, url, error };
 };
