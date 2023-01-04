@@ -1,28 +1,40 @@
-import  {useState, useEffect} from "react";
-import { storage } from "../firebase/config";
+import { useState, useEffect } from 'react';
+import { storage } from '../firebase/config';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+
 
 const useStorage = (file) => {
-    const [progress, setProgress] = useState(0);
-    const [error, setError] = useState(null);
-    const [url, setUrl] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState(null);
+  const [url, setUrl] = useState(null);
 
-    useEffect (() => {
-        // references
-        const storageRef = storage.ref(file.name);
-        storageRef.put(file).on('state_changed', (snap) => {
-            let percentage = (snap.bytesTransferred / snap.totalBytes) * 100;
+  useEffect(() => {
+    // create reference
+    console.log(storage);
+    const storageRef = ref(storage, file.name);
+    console.log(storageRef);
+
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+            let percentage =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             setProgress(percentage);
-        }, (err) => {
+        },
+        (err) => {
             setError(err);
-        }, async () => {
-            const url = await storageRef.getDownloadURL();
-            setUrl(url)
+        },
+        () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((url) =>
+                setUrl(url)
+            );
+        }
+    );
+}, [file]);
 
-        })
-
-    }, [file]);
-
-    return { progress, url, error }
+  return { progress, url, error };
 }
 
 export default useStorage;
