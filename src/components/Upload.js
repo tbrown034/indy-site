@@ -8,7 +8,6 @@ const Upload = () => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
   const [imageList, setImageList] = useState([])
-  const imageListRef = ref(storage, "PupImages/")
   const changeHandler = (e) => {
     console.log("changed");
     let selected = e.target.files[0];
@@ -20,8 +19,10 @@ const Upload = () => {
       setFile(null);
       setError("Please select an Image (png or jpeg)");
     }
+
   };
   useEffect(() => {
+    const imageListRef = ref(storage, "PupImages/")
     listAll(imageListRef).then((response) => {
         response.items.forEach((item) => {
             getDownloadURL(item).then((url) => {
@@ -50,8 +51,9 @@ const Upload = () => {
           {file && <ProgressBar file={file} setFile={setFile}/>}
         </div>
       </form>
+      
       {imageList.map((url) => {
-        return <img src ={url}></img>
+        return <img key={Math.random()} src={url}></img>
 
       })}
 
